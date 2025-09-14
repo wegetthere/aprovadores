@@ -5,6 +5,63 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-09-14
+
+### 🗂️ Organização
+- 📁 Reestruturação completa do projeto
+- 📋 Separação clara: `scripts/`, `examples/`, `tests/`, `docs/`
+- 📚 Documentação modular e navegável
+- 🧹 Remoção de licença (projeto interno)
+
+### 🔧 Melhorias
+- ✨ Pasta `examples/` com casos de uso práticos
+- 📖 Índice de documentação em `docs/README.md`
+- 🧪 Scripts de demonstração organizados em `tests/`
+- 🎯 Estrutura seguindo melhores práticas
+
+### 📁 Nova Estrutura
+```
+aprovadores/
+├── action.yml
+├── scripts/           # Código de produção
+├── examples/          # Exemplos práticos
+├── tests/            # Demos e testes
+├── docs/             # Documentação detalhada
+└── README.md         # Documentação principal
+```
+
+## [1.1.0] - 2025-09-13
+
+### 🚀 Adicionado
+- ✨ Suporte a múltiplas organizações (multi-org)
+- 🔍 Detecção dinâmica de branch protection rules
+- 📋 Busca automática de organization rulesets
+- ⚙️ Inputs configuráveis para aprovações por tipo de branch
+- 🎯 Padrões de skip de branches customizáveis
+- 📚 Documentação específica para multi-org (MULTI-ORG.md)
+
+### 🔧 Modificado
+- 🏗️ Refatoração completa da função `get_ruleset_id()` → `get_branch_protection_rules()`
+- 🔄 Estratégia hierárquica de detecção de regras
+- 📈 Melhoria na flexibilidade de configuração
+- 🛡️ Tratamento robusto de falhas de API
+
+### 🐛 Corrigido
+- ❌ Ruleset IDs hardcoded que causavam falhas em outras organizações
+- 🔒 Dependência específica de uma organização
+- ⚡ Problemas de compatibilidade entre organizações
+
+### 💥 Breaking Changes
+- 🔄 Remoção de ruleset IDs hardcoded
+- 📝 Novos inputs opcionais (mantém compatibilidade)
+
+### 🎯 Funcionalidades
+- Detecção automática de regras por branch protection
+- Fallback inteligente usando organization rulesets
+- Configuração customizável via inputs
+- Suporte a skip patterns para branches especiais
+- Compatibilidade total com organizações múltiplas
+
 ## [1.0.0] - 2025-09-12
 
 ### Adicionado
@@ -15,7 +72,6 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - 🎨 Logs coloridos e informativos
 - 📚 Documentação completa com exemplos
 - ✅ Testes básicos de sintaxe
-- 🔒 Licença MIT
 
 ### Recursos
 - Verifica aprovações de PRs contra teams do CODEOWNERS

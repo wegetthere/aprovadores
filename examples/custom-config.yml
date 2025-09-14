@@ -1,0 +1,35 @@
+# Exemplo com configurações customizadas
+# Arquivo: .github/workflows/check-approvers-custom.yml
+
+name: Check PR Approvers (Custom Config)
+
+on:
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+jobs:
+  check-approvers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Generate token (se usando app de autenticação)
+        uses: Bradesco-Actions/generate-token@v1
+        id: generate-token
+        with:
+          org: ${{ github.repository_owner }}
+          app-id: ${{ vars.AUTHENTICATION_AND_AUTHORIZATION_APP_ID }}
+          app-private-key: ${{ secrets.AUTHENTICATION_AND_AUTHORIZATION_PRIVATE_KEY }}
+        
+      - name: Check PR Approvers
+        uses: br-action/check-pr-approvers@v1
+        with:
+          github-token: ${{ steps.generate-token.outputs.token }}
+          organization: ${{ github.repository_owner }}
+          repository: ${{ github.event.repository.name }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+          required-approvals-main: '3'
+          required-approvals-develop: '2'
+          required-approvals-feature: '1'
+          skip-branch-patterns: 'dependabot/*,renovate/*'

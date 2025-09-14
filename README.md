@@ -1,6 +1,10 @@
 # Check PR Approvers Action
 
-Uma GitHub Action para verificar se um pull request possui o número mínimo de aprovações de membros dos times definidos no arquivo CODEOWNERS, seguindo as regras de branch protection configuradas no repositório.
+Uma GitHub Action para verificar se um pull request possui o número mínimo de aprovações de membros dos times definidos no arquivo CODEOWNERS, seguindo as regras de branch protecti4. Abra uma [issue](../../issues) no repositório
+
+---
+
+Desenvolvido com ❤️ pela Squad DevSecOps repositório.
 
 ## 📋 Funcionalidades
 
@@ -45,10 +49,14 @@ jobs:
   uses: ./aprovadores
   with:
     github-token: ${{ secrets.CUSTOM_TOKEN }}
-    organization: 'minha-org'
+    organization: 'br-next'
     repository: 'meu-repo'
     pull-request-number: '123'
     codeowners-path: 'docs/CODEOWNERS'
+    required-approvals-main: '3'
+    required-approvals-develop: '2'
+    required-approvals-feature: '1'
+    skip-branch-patterns: 'dependabot/*,renovate/*'
 ```
 
 ## 📥 Inputs
@@ -60,6 +68,10 @@ jobs:
 | `repository` | Nome do repositório | ✅ | - |
 | `pull-request-number` | Número do pull request | ✅ | - |
 | `codeowners-path` | Caminho para o arquivo CODEOWNERS | ❌ | `.github/CODEOWNERS` |
+| `required-approvals-main` | Aprovações mínimas para branch main (fallback) | ❌ | `2` |
+| `required-approvals-develop` | Aprovações mínimas para branches develop/hotfix (fallback) | ❌ | `1` |
+| `required-approvals-feature` | Aprovações mínimas para feature branches (fallback) | ❌ | `1` |
+| `skip-branch-patterns` | Padrões de branches a ignorar (separados por vírgula) | ❌ | - |
 
 ## 📤 Outputs
 
@@ -98,14 +110,26 @@ A action lê o arquivo CODEOWNERS e extrai os times definidos. Exemplo:
 docs/ @minha-org/docs-team
 ```
 
-## 🎯 Regras por Branch
+## 🎯 Estratégia de Detecção de Regras
 
-A action aplica diferentes rulesets baseados na branch de destino:
+A action utiliza uma abordagem **hierárquica** para determinar o número de aprovações necessárias:
 
-- **main**: Ruleset ID `4598964`
-- **develop, dev/*, hotfix, hotfix/***: Ruleset ID `4599019`
-- **Branches de feature** (padrão: `(BG|CE|IN|TASK|TS)/S[0-9]{2}/NEXT2-[0-9]{5,7}(-[0-9]+)?`): Ruleset ID `4598964`
-- **Outras branches**: Verificação ignorada
+### 1. 🔍 Branch Protection Rules (Prioridade Alta)
+- Verifica regras específicas configuradas na branch
+- API: `/repos/{org}/{repo}/branches/{branch}/protection`
+
+### 2. 📋 Organization Rulesets (Prioridade Média)
+- Busca rulesets da organização que se aplicam à branch
+- API: `/orgs/{org}/rulesets`
+
+### 3. 🎯 Configuração via Inputs (Prioridade Baixa)
+- Usa valores definidos nos inputs da action
+- Permite customização por organização
+
+### 4. 📌 Fallback Padrão (Última Opção)
+- **main/master**: 2 aprovações
+- **develop/dev/hotfix**: 1 aprovação  
+- **feature branches**: 1 aprovação
 
 ## 🔧 Requisitos
 
@@ -151,42 +175,44 @@ aprovadores/
 ├── action.yml              # Definição da action
 ├── scripts/
 │   └── check-approvers.sh  # Script principal
+├── examples/               # Exemplos de uso
+│   ├── basic-usage.yml     # Uso básico
+│   ├── custom-config.yml   # Configuração avançada
+│   └── with-outputs.yml    # Usando outputs
+├── tests/
+│   └── demo-multi-org.sh   # Demonstração multi-org
+├── docs/                   # Documentação detalhada
+│   ├── MULTI-ORG.md        # Guia multi-organizações
+│   ├── USAGE.md            # Exemplos de migração
+│   └── DEPLOY.md           # Guia de publicação
 └── README.md               # Esta documentação
 ```
 
 ### Executar localmente
 
 ```bash
-# Definir variáveis de ambiente
+# Executar demonstração multi-org
+./tests/demo-multi-org.sh
+
+# Definir variáveis de ambiente para teste manual
 export INPUT_GITHUB_TOKEN="seu-token"
 export INPUT_ORGANIZATION="sua-org"
 export INPUT_REPOSITORY="seu-repo"
 export INPUT_PULL_REQUEST_NUMBER="123"
 export INPUT_CODEOWNERS_PATH=".github/CODEOWNERS"
 
-# Executar script
+# Executar script principal
 ./scripts/check-approvers.sh
 ```
-
-## 🤝 Contribuindo
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -am 'Add nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## 🆘 Suporte
 
 Para dúvidas ou problemas:
 
-1. Verifique a [documentação](#-como-usar)
-2. Consulte os [exemplos](#exemplo-básico)
-3. Abra uma [issue](../../issues) no repositório
+1. Verifique os [exemplos práticos](examples/)
+2. Consulte a [documentação detalhada](docs/)
+3. Execute a [demonstração](tests/demo-multi-org.sh)
+4. Abra uma [issue](../../issues) no repositório
 
 ---
 

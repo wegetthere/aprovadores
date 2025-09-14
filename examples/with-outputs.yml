@@ -1,0 +1,58 @@
+# Exemplo usando outputs da action
+# Arquivo: .github/workflows/check-approvers-with-outputs.yml
+
+name: Check PR Approvers with Outputs
+
+on:
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+jobs:
+  check-approvers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Check PR Approvers
+        id: check-approvers
+        uses: br-action/check-pr-approvers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          organization: ${{ github.repository_owner }}
+          repository: ${{ github.event.repository.name }}
+          pull-request-number: ${{ github.event.pull_request.number }}
+
+      - name: Print results
+        run: |
+          echo "Status: ${{ steps.check-approvers.outputs.status }}"
+          echo "Approved: ${{ steps.check-approvers.outputs.approved-count }}"
+          echo "Required: ${{ steps.check-approvers.outputs.required-count }}"
+
+      - name: Block merge if insufficient approvals
+        if: steps.check-approvers.outputs.status == 'failed'
+        run: |
+          echo "❌ Insufficient approvals: ${{ steps.check-approvers.outputs.approved-count }}/${{ steps.check-approvers.outputs.required-count }}"
+          exit 1
+
+      - name: Allow merge
+        if: steps.check-approvers.outputs.status == 'success'
+        run: |
+          echo "✅ PR approved: ${{ steps.check-approvers.outputs.approved-count }}/${{ steps.check-approvers.outputs.required-count }}"
+
+      - name: Comment on PR (optional)
+        if: steps.check-approvers.outputs.status == 'failed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `❌ **Aprovações insuficientes**
+              
+              Este PR precisa de **${{ steps.check-approvers.outputs.required-count }}** aprovações.
+              Aprovações atuais: **${{ steps.check-approvers.outputs.approved-count }}**
+              
+              Solicite review dos membros dos teams no CODEOWNERS.`
+            })

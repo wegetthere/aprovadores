@@ -23,6 +23,22 @@ inputs:
     description: 'Caminho para o arquivo CODEOWNERS'
     required: false
     default: '.github/CODEOWNERS'
+  required-approvals-main:
+    description: 'Número mínimo de aprovações para branch main (fallback)'
+    required: false
+    default: '2'
+  required-approvals-develop:
+    description: 'Número mínimo de aprovações para branches develop/hotfix (fallback)'
+    required: false
+    default: '1'
+  required-approvals-feature:
+    description: 'Número mínimo de aprovações para feature branches (fallback)'
+    required: false
+    default: '1'
+  skip-branch-patterns:
+    description: 'Padrões de branches que devem ser ignorados (separados por vírgula)'
+    required: false
+    default: ''
 
 outputs:
   approved-count:
@@ -44,3 +60,7 @@ runs:
         INPUT_REPOSITORY: ${{ inputs.repository }}
         INPUT_PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
         INPUT_CODEOWNERS_PATH: ${{ inputs.codeowners-path }}
+        INPUT_REQUIRED_APPROVALS_MAIN: ${{ inputs.required-approvals-main }}
+        INPUT_REQUIRED_APPROVALS_DEVELOP: ${{ inputs.required-approvals-develop }}
+        INPUT_REQUIRED_APPROVALS_FEATURE: ${{ inputs.required-approvals-feature }}
+        INPUT_SKIP_BRANCH_PATTERNS: ${{ inputs.skip-branch-patterns }}

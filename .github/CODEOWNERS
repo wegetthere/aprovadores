@@ -1,17 +1,1 @@
-# CODEOWNERS - Exemplo para testes
-# Documentação: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
-
-# Regra global - todos os arquivos
-* @sua-org/devops-team @sua-org/backend-team
-
-# Arquivos específicos
-*.md @sua-org/docs-team
-*.yml @sua-org/devops-team
-*.yaml @sua-org/devops-team
-
-# Diretórios específicos
-/scripts/ @sua-org/devops-team
-/.github/ @sua-org/devops-team
-
-# Arquivos de configuração
-action.yml @sua-org/devops-team @sua-org/platform-team
+* @br-core/backend-team @br-core/devops-team

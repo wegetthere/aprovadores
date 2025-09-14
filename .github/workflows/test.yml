@@ -52,3 +52,11 @@ jobs:
           ./scripts/check-approvers.sh || echo "Expected to fail at API call - that's OK for syntax test"
           
           echo "✅ Basic script execution test completed"
+
+      - name: Test demo script
+        run: |
+          echo "🧪 Testing demo script..."
+          cd tests/
+          chmod +x demo-multi-org.sh
+          ./demo-multi-org.sh
+          echo "✅ Demo script test completed"

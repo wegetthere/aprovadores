@@ -1,0 +1,23 @@
+# Exemplo básico de uso da action
+# Arquivo: .github/workflows/check-approvers.yml
+
+name: Check PR Approvers
+
+on:
+  pull_request_review:
+    types: [submitted, edited, dismissed]
+
+jobs:
+  check-approvers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Check PR Approvers
+        uses: br-action/check-pr-approvers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          organization: ${{ github.repository_owner }}
+          repository: ${{ github.event.repository.name }}
+          pull-request-number: ${{ github.event.pull_request.number }}
