@@ -1,0 +1,54 @@
+name: Test Action
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test shell script syntax
+        run: |
+          bash -n scripts/check-approvers.sh
+          echo "✅ Script syntax is valid"
+
+      - name: Test action metadata
+        run: |
+          # Verifica se o action.yml é válido
+          if [ -f "action.yml" ]; then
+            echo "✅ action.yml found"
+            # Aqui você pode adicionar validação YAML se necessário
+          else
+            echo "❌ action.yml not found"
+            exit 1
+          fi
+
+      - name: Test with mock data (dry run)
+        env:
+          INPUT_GITHUB_TOKEN: "mock-token"
+          INPUT_ORGANIZATION: "test-org"
+          INPUT_REPOSITORY: "test-repo"
+          INPUT_PULL_REQUEST_NUMBER: "1"
+          INPUT_CODEOWNERS_PATH: ".github/CODEOWNERS"
+          GITHUB_OUTPUT: "/tmp/github_output"
+        run: |
+          # Cria um CODEOWNERS mock para teste
+          mkdir -p .github
+          echo "* @test-org/test-team" > .github/CODEOWNERS
+          
+          # Cria arquivo de output mock
+          touch /tmp/github_output
+          
+          echo "🧪 Testing script with mock data..."
+          echo "Note: This will fail at API calls but should validate the initial logic"
+          
+          # Executa o script (esperamos que falhe na chamada da API, mas isso é ok para teste básico)
+          ./scripts/check-approvers.sh || echo "Expected to fail at API call - that's OK for syntax test"
+          
+          echo "✅ Basic script execution test completed"

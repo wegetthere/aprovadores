@@ -1,0 +1,46 @@
+name: 'Check PR Approvers'
+description: 'Verifica se o pull request possui o número mínimo de aprovações de membros dos times definidos no CODEOWNERS'
+author: 'DevSecOps Squad'
+
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  github-token:
+    description: 'GitHub token para acessar a API'
+    required: true
+  organization:
+    description: 'Nome da organização do repositório'
+    required: true
+  repository:
+    description: 'Nome do repositório'
+    required: true
+  pull-request-number:
+    description: 'Número do pull request'
+    required: true
+  codeowners-path:
+    description: 'Caminho para o arquivo CODEOWNERS'
+    required: false
+    default: '.github/CODEOWNERS'
+
+outputs:
+  approved-count:
+    description: 'Número de aprovações válidas encontradas'
+  required-count:
+    description: 'Número mínimo de aprovações necessárias'
+  status:
+    description: 'Status da verificação (success, failed)'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Verificar Aprovadores do PR'
+      run: ${{ github.action_path }}/scripts/check-approvers.sh
+      shell: bash
+      env:
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_ORGANIZATION: ${{ inputs.organization }}
+        INPUT_REPOSITORY: ${{ inputs.repository }}
+        INPUT_PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
+        INPUT_CODEOWNERS_PATH: ${{ inputs.codeowners-path }}

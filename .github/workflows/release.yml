@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Version: ${VERSION}"
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Mudanças em ${{ steps.version.outputs.version }}
+            
+            Para ver todas as mudanças, consulte o [CHANGELOG.md](CHANGELOG.md).
+            
+            ### Como usar esta versão
+            
+            ```yaml
+            - name: Check PR Approvers
+              uses: seu-usuario/check-pr-approvers@${{ steps.version.outputs.version }}
+              with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+                organization: ${{ github.repository_owner }}
+                repository: ${{ github.event.repository.name }}
+                pull-request-number: "123"  # número do PR
+            ```
+            
+            ### Documentação
+            
+            - [README.md](README.md) - Documentação principal
+            - [USAGE.md](USAGE.md) - Exemplos de uso
+            - [CHANGELOG.md](CHANGELOG.md) - Histórico de mudanças
+          draft: false
+          prerelease: false
